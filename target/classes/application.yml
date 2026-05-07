@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/pg_rental
-    username: Sunil
-    password: Sunil@9177
+    url: jdbc:mysql://localhost:3306/pgrental
+    username: root
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
