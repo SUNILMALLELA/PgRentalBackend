@@ -1,9 +1,7 @@
 package com.example.Backend.dto;
 
 import com.example.Backend.entity.BookingStatus;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -11,12 +9,24 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserBookingDTO {
+
     private Long bookingId;
-    private BookingStatus status;
-    private LocalDateTime createdAt;
+
     private String pgTitle;
+
     private String location;
+
+    private Double price;
+
+    private String ownerName;
+
     private String ownerPhone;
+
+    private BookingStatus status;
+
+    private LocalDateTime createdAt;
+
     private String visitDate;
+
     private String note;
 }

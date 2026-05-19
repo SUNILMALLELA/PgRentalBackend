@@ -1,17 +1,15 @@
 package com.example.Backend.repository;
 
-import com.example.Backend.dto.UserBookingDTO;
 import com.example.Backend.entity.Booking;
 import com.example.Backend.entity.BookingStatus;
 import com.example.Backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByUser(User user);
@@ -21,23 +19,43 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     long countByUserId(Long userId);
 
     long countByUserIdAndStatus(Long userId, BookingStatus status);
-
     @Query("""
-            SELECT new com.example.Backend.dto.UserBookingDTO(
-                b.id,
-                b.status,
-                b.createdAt,
-                p.title,
-                p.location,
-                owner.phoneNumber,
-                b.visitDate,
-                b.note
-            )
-            FROM Booking b
-            JOIN b.pg p
-            JOIN p.owner owner
-            WHERE b.user.id = :userId
-            ORDER BY b.createdAt DESC
-            """)
-    List<UserBookingDTO> findAllBookingsByUserId(@Param("userId") Long userId);
+        SELECT
+            YEAR(b.createdAt),
+            MONTH(b.createdAt),
+            COUNT(b)
+        FROM Booking b
+        WHERE b.user.id = :userId
+          AND b.createdAt >= :from
+        GROUP BY
+            YEAR(b.createdAt),
+            MONTH(b.createdAt)
+        ORDER BY
+            YEAR(b.createdAt)  ASC,
+            MONTH(b.createdAt) ASC
+        """)
+    List<Object[]> findMonthlyBookingsRaw(
+        @Param("userId") Long userId,
+        @Param("from")   LocalDateTime from
+    );
+    @Query("""
+        SELECT new com.example.Backend.dto.UserBookingDTO(
+            b.id,
+            b.pg.title,
+            b.pg.location,
+            b.pg.price,
+            b.pg.owner.fullName,
+            b.pg.owner.phoneNumber,
+            b.status,
+            b.createdAt,
+            b.visitDate,
+            b.note
+        )
+        FROM Booking b
+        WHERE b.user.id = :userId
+        ORDER BY b.createdAt DESC
+        """)
+    List<com.example.Backend.dto.UserBookingDTO> findAllBookingsByUserId(
+        @Param("userId") Long userId
+    );
 }
